@@ -1,0 +1,16 @@
+version: 2
+
+seeds:
+  - name: acris_document_types
+    description: >
+      ACRIS Document Control Codes (NYC Open Data 7isb-wh4c), downloaded 2026-11-18.
+      doc_class collapses the city's class_code_description to deed / mortgage / lien / other.
+      Note: satisfactions (SAT) are classed as mortgage instruments by the city.
+    columns:
+      - name: doc_type
+        tests: [not_null, unique]
+      - name: doc_class
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['deed', 'mortgage', 'lien', 'other']

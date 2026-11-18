@@ -26,9 +26,9 @@ Definition of done:
 - [ ] (1 of 3 done) Look up 3 known addresses and sanity-check their lot data by hand
 
 Open questions to resolve in Sprint 1:
-- Which ACRIS document types count as deeds vs. mortgages vs. satisfactions?
+- [x] Which ACRIS document types count as deeds vs. mortgages vs. satisfactions? (acris_document_types seed)
 - How do DOB NOW and older BIS filings overlap for the same job?
-- Which violation statuses mean "open"?
+- [x] Which violation statuses mean "open"? (DOB: no `*` in prefix; ECB: ACTIVE; HPD: Open)
 
 ### 2026-11-17 — Project kickoff
 - **Goal:** Repo scaffold, loaders, dbt project, property spine.
@@ -62,3 +62,11 @@ Open questions to resolve in Sprint 1:
 - **Numbers:** ECB 555,604 rows (unique record IDs), 93,082 open. DOB NOW permits 269,443 rows, 9,614 contractors, 44,506 lots. Each full load took about 6 minutes without a token. Tests: 7 pass, 1 warn.
 - **Finding (product-critical):** About $302M in unpaid ECB balances across Brooklyn, $221M of it on high-severity violations, on roughly 20k lots. Unpaid balance is a concrete, dollar-denominated buyer red flag and a candidate headline metric for the memo.
 - **Lesson:** When a uniqueness test fails, profile which columns vary inside the duplicate groups before deduplicating. Here it revealed a business rule (multi-work-type permits), not dirty data.
+
+### 2026-11-18 — HPD and ACRIS staging; ACRIS document-type seed
+- **Goal:** Stage the owner side (HPD registrations and contacts), housing conditions (HPD violations) and transactions (ACRIS master and legals).
+- **Decision / change:** Added the `acris_document_types` dbt seed from the city's ACRIS Document Control Codes (7isb-wh4c, 126 codes) instead of a hand-written list. `doc_class` = deed (34) / mortgage (23) / lien (29) / other (40). This answers the Sprint 1 open question on deed vs mortgage types. Caveat: the city classes satisfactions (`SAT`) as mortgage instruments; separate them when computing outstanding debt. HPD class mapped to severity: C high, B medium, A low, I info (information orders are administrative).
+- **Problem hit:** `registrationcontactid` is not unique in the source. About 1,450 of 744k IDs (0.2%) are reused, sometimes for different people at different addresses. A first fix (dedupe raw rows, then hash) still collided, because rows that differ only in dropped columns (middle initial, suite) become identical after cleaning.
+- **Fix:** Deduplicate after cleaning; `contact_row_key = md5(cleaned row)` is the tested unique key. The source ID's uniqueness is a warning that fails above 2,500.
+- **Numbers (Brooklyn, from the portal):** HPD violations 4,285,884 (open: B 572k, A 303k, C 225k, I 109k). ACRIS master 4,337,889 (MTGE 1.23M, DEED 1.07M, SAT 761k, ASST 575k). HPD contact types: SiteManager 156k, Agent 148k, HeadOfficer 121k, CorporateOwner 114k, IndividualOwner 47k. Full dbt build on samples: 49 pass, 3 warn (all explained), 0 errors.
+- **Lesson:** A relationship test between two independently sampled tables produces meaningless orphans; it is set to warn and must be read on the full load. Deduplicate at the grain you actually keep, not the raw grain.

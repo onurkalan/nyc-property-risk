@@ -78,3 +78,60 @@ models:
           - not_null
       - name: contractor_license_number
         description: Applicant license number; key for contractor vetting.
+
+  - name: stg_hpd_violations
+    description: HPD housing code violations. Class C = immediately hazardous; I = information order.
+    columns:
+      - name: violation_id
+        tests: [not_null, unique]
+      - name: is_open
+        tests: [not_null]
+      - name: severity_level
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['high', 'medium', 'low', 'info', 'unknown']
+
+  - name: stg_hpd_registrations
+    description: HPD multiple-dwelling registrations (3+ unit buildings).
+    columns:
+      - name: hpd_registration_id
+        tests: [not_null, unique]
+
+  - name: stg_hpd_registration_contacts
+    description: >
+      Owners, officers and agents on HPD registrations (citywide). The source contact ID
+      is reused for ~0.2% of rows, so contact_row_key (hash of the row) is the unique key.
+    columns:
+      - name: contact_row_key
+        tests: [not_null, unique]
+      - name: registration_contact_id
+        tests:
+          - not_null
+          - unique:
+              config:
+                severity: warn
+                error_if: '>2500'
+      - name: contact_type
+        tests: [not_null]
+
+  - name: stg_acris_master
+    description: ACRIS recorded documents, one row per document.
+    columns:
+      - name: document_id
+        tests: [not_null, unique]
+      - name: doc_type
+        tests: [not_null]
+
+  - name: stg_acris_legals
+    description: ACRIS document-to-lot links, one row per document and lot.
+    columns:
+      - name: document_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_acris_master')
+                field: document_id
+              config:
+                severity: warn
