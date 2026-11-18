@@ -46,3 +46,35 @@ models:
         description: True when the category prefix has no '*'.
         tests:
           - not_null
+
+  - name: stg_ecb_violations
+    description: >
+      ECB violations issued by Buildings, with penalties. severity_level normalizes the
+      old (Hazardous/Non-Hazardous) and new (CLASS 1/2/3) schemes to high/medium/low.
+    columns:
+      - name: ecb_record_id
+        description: isn_dob_bis_extract, the source record key.
+        tests:
+          - not_null
+          - unique
+      - name: is_open
+        tests:
+          - not_null
+      - name: severity_level
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['high', 'medium', 'low', 'unknown']
+      - name: balance_due
+        description: Unpaid penalty in dollars; unpaid ECB balances can become liens.
+
+  - name: stg_dobnow_approved_permits
+    description: >
+      DOB NOW work permits, one row per permit, sequence (renewal) number and work type. The applicant
+      is the licensed contractor.
+    columns:
+      - name: work_permit
+        tests:
+          - not_null
+      - name: contractor_license_number
+        description: Applicant license number; key for contractor vetting.
