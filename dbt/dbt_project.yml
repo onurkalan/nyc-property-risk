@@ -1,0 +1,23 @@
+name: nyc_property_risk
+version: "0.1.0"
+config-version: 2
+profile: nyc_property_risk
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Borough code for version 1 (3 = Brooklyn). Used in tests and marts.
+  borough_code: "3"
+
+models:
+  nyc_property_risk:
+    staging:
+      +materialized: view
+      +schema: staging
+    marts:
+      +materialized: table
+      +schema: marts

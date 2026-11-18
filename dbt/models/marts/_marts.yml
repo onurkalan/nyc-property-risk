@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: dim_property
+    description: >
+      Property spine. One row per tax lot (BBL) with the attributes every risk report
+      starts from. All other facts (permits, violations, sales, ownership) join here.
+    columns:
+      - name: bbl
+        tests:
+          - not_null
+          - unique
+      - name: residential_size_band
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['non_residential', '1_4_family', 'small_multifamily', 'mid_multifamily', 'large_multifamily']
+      - name: is_v1_target_type
+        description: True for 1–4 family and small multifamily lots, the scope of version 1.
+        tests:
+          - not_null

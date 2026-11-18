@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SOCRATA_APP_TOKEN: ${{ secrets.SOCRATA_APP_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check dataset IDs and filters
+        run: python scripts/verify_datasets.py
+
+      - name: Load a small sample of each dataset
+        run: python scripts/load_raw.py --sample 2000
+
+      - name: dbt build (models + tests)
+        working-directory: dbt
+        run: dbt build --profiles-dir .

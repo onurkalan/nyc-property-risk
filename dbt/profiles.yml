@@ -1,0 +1,7 @@
+nyc_property_risk:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: nyc_property_risk.duckdb
+      threads: 4

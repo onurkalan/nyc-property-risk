@@ -1,0 +1,48 @@
+version: 2
+
+models:
+  - name: stg_pluto
+    description: Typed and cleaned PLUTO lots. One row per tax lot (BBL).
+    columns:
+      - name: bbl
+        description: 10-digit borough-block-lot identifier, zero-padded.
+        tests:
+          - not_null
+          - unique
+      - name: borough_code
+        description: 1 Manhattan, 2 Bronx, 3 Brooklyn, 4 Queens, 5 Staten Island.
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['1', '2', '3', '4', '5']
+      - name: block
+        tests:
+          - not_null
+      - name: lot
+        tests:
+          - not_null
+      - name: residential_units
+        description: Residential units on the lot.
+      - name: year_built
+        description: Year built; zero values in the source are treated as unknown.
+
+  - name: stg_dob_violations
+    description: >
+      Buildings Department (BIS) violations, one row per violation. Open/closed and
+      risk flags are parsed from the violation_category prefix ('*' = closed,
+      W = work without permit, H = hazardous).
+    columns:
+      - name: violation_id
+        description: isn_dob_bis_viol, the source's unique violation key.
+        tests:
+          - not_null
+          - unique
+      - name: bbl
+        description: Built from boro + block + lot. Null when block/lot are missing (~1% of rows).
+      - name: issue_date
+        description: Parsed from YYYYMMDD; impossible dates are null.
+      - name: is_open
+        description: True when the category prefix has no '*'.
+        tests:
+          - not_null

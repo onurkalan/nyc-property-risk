@@ -1,0 +1,102 @@
+{
+  "_notes": [
+    "Dataset IDs and filter column names are best-effort and MUST be confirmed with scripts/verify_datasets.py and scripts/profile_raw.py before relying on them.",
+    "Filters use Socrata SoQL syntax. Borough is coded differently across datasets (BK, BROOKLYN, 3).",
+    "Set enabled=false for anything not needed yet; Sprint 1 loads the core set only."
+  ],
+  "portal": "https://data.cityofnewyork.us",
+  "borough_name": "Brooklyn",
+  "page_size": 50000,
+  "datasets": {
+    "pluto": {
+      "id": "64uk-42ks",
+      "description": "City Planning lot-level data (PLUTO): the property spine",
+      "where": "borough = 'BK'",
+      "enabled": true
+    },
+    "dob_permit_issuance": {
+      "id": "ipu4-2q9a",
+      "description": "Buildings Department permits issued (older BIS system)",
+      "where": "borough = 'BROOKLYN'",
+      "enabled": true
+    },
+    "dob_job_filings_legacy": {
+      "id": "ic3t-wcy2",
+      "description": "Buildings Department job application filings (older BIS system)",
+      "where": "borough = 'BROOKLYN'",
+      "enabled": true
+    },
+    "dobnow_job_filings": {
+      "id": "w9ak-ipjd",
+      "description": "Buildings Department job filings (newer DOB NOW system)",
+      "where": "borough = 'Brooklyn'",
+      "enabled": true
+    },
+    "dobnow_approved_permits": {
+      "id": "rbx6-tga4",
+      "description": "Buildings Department approved permits (newer DOB NOW system)",
+      "where": "borough = 'Brooklyn'",
+      "enabled": true
+    },
+    "dob_violations": {
+      "id": "3h2n-5cm9",
+      "description": "Buildings Department violations",
+      "where": "boro = '3'",
+      "enabled": true
+    },
+    "ecb_violations": {
+      "id": "6bgk-3dad",
+      "description": "Environmental control board violations issued by Buildings (with penalties)",
+      "where": "boro = '3'",
+      "enabled": true
+    },
+    "hpd_violations": {
+      "id": "wvxf-dwi5",
+      "description": "Housing Preservation and Development housing code violations",
+      "where": "boroid = '3'",
+      "enabled": true
+    },
+    "hpd_registrations": {
+      "id": "tesw-yqqr",
+      "description": "Housing Preservation and Development building registrations",
+      "where": "boroid = '3'",
+      "enabled": true
+    },
+    "hpd_registration_contacts": {
+      "id": "feu5-w2e2",
+      "description": "Owner and managing agent contacts for HPD registrations (joins on registrationid; no borough column)",
+      "where": null,
+      "enabled": true
+    },
+    "acris_master": {
+      "id": "bnx9-e6tj",
+      "description": "ACRIS real property master: one row per recorded document (deeds, mortgages)",
+      "where": "recorded_borough = '3'",
+      "enabled": true
+    },
+    "acris_legals": {
+      "id": "8h5j-fqxa",
+      "description": "ACRIS real property legals: which lots each document covers",
+      "where": "borough = '3'",
+      "enabled": true
+    },
+    "acris_parties": {
+      "id": "636b-3b5g",
+      "description": "ACRIS parties (buyers, sellers, lenders). Very large and has no borough column; load in Sprint 2 filtered to Brooklyn document IDs.",
+      "where": null,
+      "enabled": false
+    },
+    "dof_annualized_sales": {
+      "id": "w2pb-icbu",
+      "description": "Department of Finance citywide annualized sales. ID and borough filter verified 2026-11-17.",
+      "where": "borough = '3'",
+      "enabled": false
+    },
+    "dob_complaints": {
+      "id": "eabe-havv",
+      "description": "Buildings Department complaints received (includes stop-work related dispositions). No borough column; Brooklyn community boards start with 3.",
+      "where": "community_board like '3%'",
+      "enabled": false
+    }
+  }
+}

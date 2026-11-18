@@ -1,0 +1,34 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw NYC Open Data downloads written by scripts/load_raw.py as gzipped CSV chunks.
+      Every column is read as text; typing happens in the staging models.
+    meta:
+      external_location: "read_csv('../data/raw/{name}/part-*.csv.gz', header=true, union_by_name=true, all_varchar=true)"
+    tables:
+      - name: pluto
+        description: City Planning lot-level data (PLUTO), one row per tax lot.
+      - name: dob_permit_issuance
+        description: Buildings Department permits issued (older BIS system).
+      - name: dob_job_filings_legacy
+        description: Buildings Department job application filings (older BIS system).
+      - name: dobnow_job_filings
+        description: Buildings Department job filings (DOB NOW).
+      - name: dobnow_approved_permits
+        description: Buildings Department approved permits (DOB NOW).
+      - name: dob_violations
+        description: Buildings Department violations.
+      - name: ecb_violations
+        description: Environmental control board violations issued by Buildings.
+      - name: hpd_violations
+        description: Housing Preservation and Development housing code violations.
+      - name: hpd_registrations
+        description: Housing Preservation and Development building registrations.
+      - name: hpd_registration_contacts
+        description: Owner and managing agent contacts for HPD registrations.
+      - name: acris_master
+        description: ACRIS document master (deeds, mortgages, satisfactions).
+      - name: acris_legals
+        description: ACRIS legals linking documents to lots.
