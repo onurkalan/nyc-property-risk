@@ -39,7 +39,7 @@ def http_get(url: str, params: dict | None = None, retries: int = 5, timeout: in
         clean = {k: v for k, v in params.items() if v is not None}
         url = f"{url}?{urllib.parse.urlencode(clean)}"
     headers = {"User-Agent": USER_AGENT}
-    token = os.environ.get("SOCRATA_APP_TOKEN")
+    token = (os.environ.get("SOCRATA_APP_TOKEN") or "").strip()
     if token:
         headers["X-App-Token"] = token
 
