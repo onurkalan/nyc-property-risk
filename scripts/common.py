@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import os
+import http.client
 import time
 import urllib.error
 import urllib.parse
@@ -57,7 +58,7 @@ def http_get(url: str, params: dict | None = None, retries: int = 5, timeout: in
                 delay *= 2
                 continue
             raise RuntimeError(f"HTTP {err.code} for {url}\n{body}") from err
-        except (urllib.error.URLError, TimeoutError) as err:
+        except (urllib.error.URLError, TimeoutError, ConnectionError, http.client.IncompleteRead) as err:
             if attempt < retries:
                 print(f"    Network error ({err}), retrying in {delay:.0f}s (attempt {attempt}/{retries})")
                 time.sleep(delay)
