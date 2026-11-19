@@ -10,3 +10,4 @@ dbt/dbt_packages/
 .env
 .DS_Store
 dbt/.user.yml
+*.log

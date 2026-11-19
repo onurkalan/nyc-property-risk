@@ -1,5 +1,6 @@
 -- One row per HPD multiple-dwelling registration. Buildings with 3+ units must register
 -- owners and managing agents annually; contacts live in stg_hpd_registration_contacts.
+-- Grain: registration + building. A few registration IDs cover two buildings in the source.
 
 with source as (
 

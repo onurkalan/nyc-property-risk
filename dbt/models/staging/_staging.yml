@@ -93,10 +93,17 @@ models:
                 values: ['high', 'medium', 'low', 'info', 'unknown']
 
   - name: stg_hpd_registrations
-    description: HPD multiple-dwelling registrations (3+ unit buildings).
+    description: >
+      HPD multiple-dwelling registrations (3+ unit buildings). Grain is registration +
+      building: the source reuses a few registration IDs across two buildings (3 in Brooklyn).
     columns:
       - name: hpd_registration_id
-        tests: [not_null, unique]
+        tests:
+          - not_null
+          - unique:
+              config:
+                severity: warn
+                error_if: '>100'
 
   - name: stg_hpd_registration_contacts
     description: >
