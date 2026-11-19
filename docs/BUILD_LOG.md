@@ -78,3 +78,12 @@ Open questions to resolve in Sprint 1:
 - **Tests:** 3,500-row sample in 1,000-row pages gave 3,500 unique rows. HPD registrations, killed after page 2 and rerun, resumed at page 3 and finished at 80,850 rows, matching the portal.
 - **Finding:** That test exposed 3 HPD registration IDs reused across two buildings in the source (confirmed via the API). Grain is now registration + building; registration ID uniqueness is a warning that fails above 100.
 - **Lesson:** Offset pagination is fine for samples and fails at scale. Verify that a failed load did not leave stale data that looks complete.
+
+### 2026-11-19 — HPD reload (resume proven); CSV dialect made explicit
+- **Goal:** Finish the full load and run every model on all of Brooklyn.
+- **Problem hit (load):** The HPD violations reload crashed at page 29 on `http.client.IncompleteRead` (connection dropped mid-transfer), which the retry logic did not catch.
+- **Fix (load):** Retry now also covers `IncompleteRead` and `ConnectionError`. The rerun printed "resuming after page 29" and finished, the first resume after a real failure. Keyset pages 1–29 took about 25 minutes, against the offset loader's 1.4M-row slowdown.
+- **Problem hit (dbt):** The first full-data build gave 47 pass, 3 warn, 3 errors. 27 of 150 ACRIS legals files failed to parse (`Expected 14 columns, found 15`). DuckDB's CSV sniffer reads the opening rows; files with no quoted values there were classed as "no quote character", so `"OCEAN AVE, APT. 2B"` split on its comma. Datasets with an early quoted value were sniffed correctly, which hid the problem in samples.
+- **Fix (dbt):** The source `read_csv` now sets `delim=','`, `quote='"'`, `escape='"'` explicitly, matching Python's csv writer. Added `scripts/find_bad_csv.py`, which tests each raw chunk with the same options and prints offending lines.
+- **Numbers (full Brooklyn, before the fix):** Warnings were exactly as predicted: 217 DOB NOW permit duplicates, 3 reused HPD registration IDs, 752 reused HPD contact IDs (Brooklyn; about 1,450 citywide).
+- **Lesson:** Never let a parser guess a format you control. Auto-detection that works on most files is worse than failing, because the files it gets wrong look fine.

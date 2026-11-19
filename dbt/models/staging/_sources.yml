@@ -5,8 +5,11 @@ sources:
     description: >
       Raw NYC Open Data downloads written by scripts/load_raw.py as gzipped CSV chunks.
       Every column is read as text; typing happens in the staging models.
+      The CSV dialect is set explicitly to match Python's csv writer (comma, double-quote,
+      quotes escaped by doubling). Auto-detection guessed "no quote character" on files whose
+      first rows had no quoted values, then broke on values like "OCEAN AVE, APT. 2B".
     meta:
-      external_location: "read_csv('../data/raw/{name}/part-*.csv.gz', header=true, union_by_name=true, all_varchar=true)"
+      external_location: "read_csv('../data/raw/{name}/part-*.csv.gz', header=true, union_by_name=true, all_varchar=true, delim=',', quote='\"', escape='\"')"
     tables:
       - name: pluto
         description: City Planning lot-level data (PLUTO), one row per tax lot.
